@@ -9,8 +9,17 @@ namespace Gameplay.Tag;
 
 public class GameplayTagsManager
 {
+    
+    
+    public static GameplayTagsManager Instance
+    {
+        get { return _instance; }
+    }
+    
     public GameplayTagNode Root { get; set; }
     public Dictionary<GameplayTag, GameplayTagNode> TagMap { get; set; }
+    
+    private static readonly GameplayTagsManager _instance = new GameplayTagsManager();
     
     public GameplayTagsManager()
     {
