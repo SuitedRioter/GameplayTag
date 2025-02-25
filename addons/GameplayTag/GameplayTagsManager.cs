@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Gameplay.Tag;
 
@@ -23,12 +24,84 @@ public class GameplayTagsManager
     /// <param name="tagName">标签全名</param>
     public void AddTagNode(string tagName)
     {
-        
+        var currentNode = Root;
+        var parts = tagName.Split(".");
+        var fullTagName = "";
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var isExplicit = i == parts.Length - 1;
+            var shortTagName = string.Intern(parts[i]);
+            if (i == 0)
+            {
+                fullTagName = shortTagName;
+            }
+            else
+            {
+                fullTagName = string.Intern(fullTagName + "." + shortTagName);
+            }
+
+            InsertTagIntoNodeArray(shortTagName, fullTagName, ref currentNode, isExplicit);
+        }
     }
 
-    public void InsertTagIntoNodeArray(string shortTagName, string fullTagName, GameplayTagNode parentNode, bool isExplicit)
+    public void InsertTagIntoNodeArray(string shortTagName, string fullTagName, ref GameplayTagNode parentNode, bool isExplicit)
     {
+        var childIndex = parentNode.FindChild(shortTagName);
+        if (childIndex == -1)
+        {
+            var newNode = new GameplayTagNode(shortTagName, fullTagName, parentNode, isExplicit);
+            parentNode.ChildTags.Add(newNode);
+            TagMap.Add(new GameplayTag(fullTagName), newNode);
+            parentNode = newNode;
+        }
+        else
+        {
+            parentNode = parentNode.ChildTags[childIndex];
+            parentNode.IsExplicitTag = parentNode.IsExplicitTag || isExplicit;
+        }
+    }
+
+    /// <summary>
+    /// 查找 tag 的所有父级标签
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public GameplayTagContainer GetSingleTagContainer(GameplayTag tag)
+    {
+        if (TagMap.TryGetValue(tag, out var node))
+        {
+            return node.CompleteTagWithParents;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 暂时从测试json里，加载
+    /// </summary>
+    /// <param name="settings"></param>
+    public void ConstructGameplayTagTree(GameplayTagsSettings settings)
+    {
+        LoadFromJson(settings.JsonDataForTest);
+    }
+
+    private void LoadFromJson(string json)
+    {
+        var list = JsonConvert.DeserializeObject<List<GameplayTagTableRow>>(json);
+        if (list == null)
+        {
+            return;
+        }
         
+        foreach (var row in list)
+        {
+            AddTagNode(row.TagName);
+        }
+    }
+
+    public GameplayTagContainer RequestGameplayTagParents(GameplayTag tag)
+    {
+        return GetSingleTagContainer(tag)?.GetGameplayTagParents() ?? new GameplayTagContainer();
     }
 }
 
