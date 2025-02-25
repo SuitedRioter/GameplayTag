@@ -3,6 +3,6 @@ namespace Gameplay.Tag;
 
 public class GameplayTagsSettings
 {
-    public string jsonDataForTest;
-    public string jsonSettingFilePath;
+    public string JsonDataForTest { get; set; }
+    public string JsonSettingFilePath { get; set; }
 }
