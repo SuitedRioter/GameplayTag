@@ -11,17 +11,16 @@ public class GameplayTagsManager
 {
     
     
-    public static GameplayTagsManager Instance
-    {
-        get { return _instance; }
-    }
+    private static readonly Lazy<GameplayTagsManager> _lazyInstance = new(() => new GameplayTagsManager());
+
+    // 公共静态属性，用于获取单例实例
+    public static GameplayTagsManager Instance => _lazyInstance.Value;
     
     public GameplayTagNode Root { get; set; }
     public Dictionary<GameplayTag, GameplayTagNode> TagMap { get; set; }
     
-    private static readonly GameplayTagsManager _instance = new GameplayTagsManager();
-    
-    public GameplayTagsManager()
+    // 私有构造函数，防止外部实例化
+    private GameplayTagsManager()
     {
         Root = new GameplayTagNode("root", "root", null, false);
         TagMap = new Dictionary<GameplayTag, GameplayTagNode>();
