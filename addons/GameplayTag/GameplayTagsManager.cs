@@ -90,10 +90,10 @@ public class GameplayTagsManager
     /// <param name="settings"></param>
     public void ConstructGameplayTagTree(GameplayTagsSettings settings)
     {
-        LoadFromJson(settings.JsonDataForTest);
+        loadFromJson(settings.JsonDataForTest);
     }
 
-    private void LoadFromJson(string json)
+    private void loadFromJson(string json)
     {
         var list = JsonConvert.DeserializeObject<List<GameplayTagTableRow>>(json);
         if (list == null)
@@ -107,6 +107,13 @@ public class GameplayTagsManager
         }
     }
 
+    /// <summary>
+    /// 返回容器的所有标签，包括显示标签和隐式标签。
+    /// 需要注意，返回的容器只有 gameplay_tags 属性有值，就是标签全部放在 gameplay_tags 属性里面的。
+    /// 并且这个容器是新对象，可以修改，不影响原始的容器。
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
     public GameplayTagContainer RequestGameplayTagParents(GameplayTag tag)
     {
         return GetSingleTagContainer(tag)?.GetGameplayTagParents() ?? new GameplayTagContainer();
