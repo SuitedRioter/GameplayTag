@@ -8,6 +8,6 @@ public class GameplayTagsSettings
     
     public GameplayTagsSettings()
     {
-        JsonDataForTest = "[\n                { \"tag_name\": \"A.B.C\", \"description\": \"Description of A.B.C\" },\n                { \"tag_name\": \"A.B.D\", \"description\": \"Description of A.B.D\" },\n                { \"tag_name\": \"A.C\", \"description\": \"Description of A.C\" },\n                { \"tag_name\": \"D\", \"description\": \"Description of D\" },\n                { \"tag_name\": \"D.C\", \"description\": \"Description of D\" },\n                { \"tag_name\": \"D.C.B\", \"description\": \"Description of D\" },\n                { \"tag_name\": \"A.C.B\", \"description\": \"Description of D\" }\n            ]";
+        JsonDataForTest = "[\n                { \"tagName\": \"A.B.C\", \"description\": \"Description of A.B.C\" },\n                { \"tagName\": \"A.B.D\", \"description\": \"Description of A.B.D\" },\n                { \"tagName\": \"A.C\", \"description\": \"Description of A.C\" },\n                { \"tagName\": \"D\", \"description\": \"Description of D\" },\n                { \"tagName\": \"D.C\", \"description\": \"Description of D\" },\n                { \"tagName\": \"D.C.B\", \"description\": \"Description of D\" },\n                { \"tagName\": \"A.C.B\", \"description\": \"Description of D\" }\n            ]";
     }
 }
