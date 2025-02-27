@@ -173,13 +173,16 @@ public class GameplayTagCountContainer
         
     }
 
-    public void Reset()
+    public void Reset(bool resetEvents)
     {
         GameplayTagCountMap.Clear();
-        GameplayTagEventMap.Clear();
         ExplicitTagCountMap.Clear();
-        //ExplicitTags.Reset();
-        //OnAnyTagChangeDelegate.
+        ExplicitTags.Reset();
+        if (resetEvents)
+        {
+            GameplayTagEventMap.Clear();
+            OnAnyTagChangeDelegate = null;
+        }
     }
 
     public void FillParentTags()
