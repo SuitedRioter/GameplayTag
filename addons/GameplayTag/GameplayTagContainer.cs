@@ -248,7 +248,7 @@ public struct GameplayTag : IEquatable<GameplayTag>, IComparable<GameplayTag>
 
     public GameplayTag(string tagName)
     {
-        TagName = tagName;
+        TagName = string.Intern(tagName);
     }
 
     public bool IsValid()

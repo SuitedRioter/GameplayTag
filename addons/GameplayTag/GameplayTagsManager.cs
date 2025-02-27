@@ -38,14 +38,14 @@ public class GameplayTagsManager
         for (int i = 0; i < parts.Length; i++)
         {
             var isExplicit = i == parts.Length - 1;
-            var shortTagName = string.Intern(parts[i]);
+            var shortTagName = parts[i];
             if (i == 0)
             {
                 fullTagName = shortTagName;
             }
             else
             {
-                fullTagName = string.Intern(fullTagName + "." + shortTagName);
+                fullTagName = fullTagName + "." + shortTagName;
             }
 
             InsertTagIntoNodeArray(shortTagName, fullTagName, ref currentNode, isExplicit);
@@ -140,7 +140,7 @@ public class GameplayTagNode
     
     public GameplayTagNode(string tagName, string fullName, GameplayTagNode parentTag, bool isExplicitTag)
     {
-        TagName = tagName;
+        TagName = string.Intern(tagName);
         ParentTag = parentTag;
         IsExplicitTag = isExplicitTag;
         ChildTags = new List<GameplayTagNode>();
