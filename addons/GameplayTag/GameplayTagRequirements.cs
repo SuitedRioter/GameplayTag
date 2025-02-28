@@ -4,7 +4,9 @@ namespace Gameplay.Tag;
 
 public class GameplayTagRequirement
 {
+    // 这里面的Tag全部都要有
     public GameplayTagContainer RequireTags { get; set; } = new();
+    // 这里面的Tag全部都不能有
     public GameplayTagContainer IgnoreTags { get; set; } = new();
     public GameplayTagQuery TagQuery { get; set; } = new();
 

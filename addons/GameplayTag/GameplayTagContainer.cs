@@ -536,7 +536,7 @@ public class GameplayTagQuery
 
     public bool IsEmpty()
     {
-        return Expr.IsValid();
+        return !Expr.IsValid();
     }
 
     public static GameplayTagQuery Build(GameplayTagQueryExpression expression)

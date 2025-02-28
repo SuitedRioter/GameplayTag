@@ -12,7 +12,31 @@ public partial class Test : Node2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		GameplayTagContainerTest();
+		//GameplayTagContainerTest();
+		GameplayTagQueryTest();
+	}
+	
+	public void GameplayTagQueryTest()
+	{
+		var require = new GameplayTagRequirement();
+		// 1. 自己或者父级需要有A.B.C
+		GameplayTag tagABC = new("A.B.C");
+		require.RequireTags.AddTag(tagABC);
+		// 2. 自己或者父级不能有D.C.B
+		GameplayTag tagDCB = new("D.C.B");
+		require.IgnoreTags.AddTag(tagDCB);
+		// 3. 自己或者父级有A.C
+		GameplayTag tagAC = new("A.C");
+		require.TagQuery.Expr.AnyTagsMatch().AddTag(tagAC);
+		
+		
+		GameplayTag tagABC2 = new("A.B.C");
+		GameplayTag tagAC2 = new("A.C");
+		GameplayTagContainer containerA = new();
+		containerA.AddTag(tagABC2);
+		containerA.AddTag(tagAC2);
+		var result = require.RequirementsMet(containerA);
+		GD.Print($"requirementsMet: {result}");
 	}
 	
 	
