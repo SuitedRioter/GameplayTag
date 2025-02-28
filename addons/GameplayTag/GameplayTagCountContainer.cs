@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 namespace Gameplay.Tag;
 
 
-public class GameplayTagCountContainer
+
+public class GameplayTagCountContainer 
 {
-    
     public Dictionary<GameplayTag, int> GameplayTagCountMap { get; set; } = new();
     public Dictionary<GameplayTag, int> ExplicitTagCountMap { get; set; } = new();
     public GameplayTagContainer ExplicitTags { get; set; } = new();
@@ -26,7 +26,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool HasAllMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -48,7 +48,7 @@ public class GameplayTagCountContainer
         return allMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool HasAnyMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -70,7 +70,7 @@ public class GameplayTagCountContainer
         return anyMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public void UpdateTagCount(GameplayTagContainer container, int countDelta)
     {
         if (countDelta != 0)
@@ -97,7 +97,7 @@ public class GameplayTagCountContainer
     }
 
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool UpdateTagCount(GameplayTag tag, int countDelta)
     {
         if (countDelta != 0)
@@ -108,7 +108,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool UpdateTagCountDeferredParentRemoval(GameplayTag tag, int countDelta, List<DeferredTagChangeDelegate> tagChangeDelegates)
     {
         if (countDelta != 0)
@@ -119,7 +119,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool SetTagCount(GameplayTag tag, int newCount)
     {
         var existingCount = 0;

@@ -1,8 +1,9 @@
-using Godot;
 using Gameplay.Tag;
+using Godot;
 
 public partial class Test : Node2D
 {
+	[Export] public GameplayTagRequirement Requirement;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
