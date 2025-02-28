@@ -10,7 +10,12 @@ namespace Gameplay.Tag;
 public partial class GameplayTag : Resource, IEquatable<GameplayTag>, IComparable<GameplayTag>
 {
     [Export]
-    public string TagName { get; private set; }
+    public string TagName { get; set; }
+    
+    public GameplayTag()
+    {
+        TagName = string.Empty;
+    }
 
     public GameplayTag(string tagName)
     {

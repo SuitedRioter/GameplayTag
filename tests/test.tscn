@@ -1,6 +1,51 @@
-[gd_scene load_steps=2 format=3 uid="uid://c2vhlvuhbehak"]
+[gd_scene load_steps=15 format=3 uid="uid://c2vhlvuhbehak"]
 
 [ext_resource type="Script" path="res://tests/Test.cs" id="1_ngjr8"]
+[ext_resource type="Script" path="res://addons/GameplayTag/GameplayTag.cs" id="2_fch3w"]
+[ext_resource type="Script" path="res://addons/GameplayTag/GameplayTagContainer.cs" id="3_f81on"]
+[ext_resource type="Script" path="res://addons/GameplayTag/GameplayTagQueryExpression.cs" id="4_ns52m"]
+[ext_resource type="Script" path="res://addons/GameplayTag/GameplayTagQuery.cs" id="5_0sjr5"]
+[ext_resource type="Script" path="res://addons/GameplayTag/GameplayTagRequirement.cs" id="6_ey4ks"]
+
+[sub_resource type="Resource" id="Resource_dhedi"]
+script = ExtResource("2_fch3w")
+TagName = "D.C.B"
+
+[sub_resource type="Resource" id="Resource_eon7t"]
+script = ExtResource("3_f81on")
+GameplayTags = [SubResource("Resource_dhedi")]
+ParentTags = []
+
+[sub_resource type="Resource" id="Resource_rghae"]
+script = ExtResource("2_fch3w")
+TagName = "A.B.C"
+
+[sub_resource type="Resource" id="Resource_l6sit"]
+script = ExtResource("3_f81on")
+GameplayTags = [SubResource("Resource_rghae")]
+ParentTags = []
+
+[sub_resource type="Resource" id="Resource_skef6"]
+script = ExtResource("2_fch3w")
+TagName = "A.C"
+
+[sub_resource type="Resource" id="Resource_53cb5"]
+script = ExtResource("4_ns52m")
+ExprType = 1
+ExprSet = []
+TagSet = [SubResource("Resource_skef6")]
+
+[sub_resource type="Resource" id="Resource_unprk"]
+script = ExtResource("5_0sjr5")
+Expr = SubResource("Resource_53cb5")
+Description = ""
+
+[sub_resource type="Resource" id="Resource_onsdx"]
+script = ExtResource("6_ey4ks")
+RequireTags = SubResource("Resource_l6sit")
+IgnoreTags = SubResource("Resource_eon7t")
+TagQuery = SubResource("Resource_unprk")
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_ngjr8")
+Requirement = SubResource("Resource_onsdx")

@@ -3,6 +3,12 @@ using Godot;
 
 public partial class Test : Node2D
 {
+	/// <summary>
+	/// 目前配置：
+	/// 1. 需要有：A.B.C
+	/// 2. 不能有：D.C.B
+	/// 3. 父级有: A.C
+	/// </summary>
 	[Export] public GameplayTagRequirement Requirement;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -14,8 +20,22 @@ public partial class Test : Node2D
 	public override void _Process(double delta)
 	{
 		GameplayTagContainerTest();
+		GameplayTagQueryTest();
 	}
 	
+	
+	public void GameplayTagQueryTest()
+	{
+		if (Requirement != null)
+		{
+			GameplayTag tagABC = new("A.B.C");
+			GameplayTagContainer containerA = new();
+			containerA.AddTag(tagABC);
+			
+			var result = Requirement.RequirementsMet(containerA);
+			GD.Print($"result: {result}");
+		}
+	}
 	
 	public void GameplayTagContainerTest()
 	{
