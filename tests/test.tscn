@@ -4,3 +4,24 @@
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_ngjr8")
+
+[node name="addCount" type="Button" parent="."]
+offset_left = 70.0
+offset_top = 65.0
+offset_right = 171.0
+offset_bottom = 96.0
+text = "TagCount+1"
+
+[node name="removeCount" type="Button" parent="."]
+offset_left = 70.0
+offset_top = 107.0
+offset_right = 171.0
+offset_bottom = 138.0
+text = "TagCount-1"
+
+[node name="InfoDisplay" type="Label" parent="."]
+offset_left = 215.0
+offset_top = 74.0
+offset_right = 515.0
+offset_bottom = 124.0
+horizontal_alignment = 1

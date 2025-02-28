@@ -3,17 +3,32 @@ using Gameplay.Tag;
 
 public partial class Test : Node2D
 {
-	// Called when the node enters the scene tree for the first time.
+
+	public Button AddCount;
+	public Button RemoveCount;
+	public Label InfoDisplay;
+	
+	public GameplayTagCountContainer TagCountContainer;
+	
 	public override void _Ready()
 	{
 		GameplayTagsManager.Instance.ConstructGameplayTagTree(new GameplayTagsSettings());
+		AddCount = GetNode<Button>("addCount");
+		RemoveCount = GetNode<Button>("removeCount");
+		InfoDisplay = GetNode<Label>("InfoDisplay");
+		
+		TagCountContainer = new();
+		TagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
+
+		AddCount.Pressed += addGameplayTagCount;
+		RemoveCount.Pressed += removeGameplayTagCount;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		//GameplayTagContainerTest();
-		GameplayTagQueryTest();
+		//GameplayTagQueryTest();
 	}
 	
 	public void GameplayTagQueryTest()
@@ -71,5 +86,25 @@ public partial class Test : Node2D
 		
 		GD.Print($"hasTag: {hasTag}, hasTagExact: {hasTagExact}, hasAny: {hasAny}, hasAny2: {hasAny2}, hasAll: {hasAll}, hasAll2: {hasAll2}, hasAllExact: {hasAllExact}");
         
+	}
+
+	private void addGameplayTagCount()
+	{
+		GameplayTag tagABC = new("A.B.C");
+		var result = TagCountContainer.UpdateTagCount(tagABC, 1);
+		GD.Print($"addGameplayTagCount: {result}");
+	}
+
+	private void removeGameplayTagCount()
+	{
+		GameplayTag tagABC = new("A.B.C");
+		var result = TagCountContainer.UpdateTagCount(tagABC, -1);
+		GD.Print($"removeGameplayTagCount: {result}");
+	}
+
+	private void onGameplayTagCountChanged(GameplayTag tag, int count)
+	{
+		GD.Print($"onGameplayTagCountChanged: {tag}, {count}");
+		InfoDisplay.Text = $"onGameplayTagCountChanged: {tag}, {count}";
 	}
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Godot;
 
 namespace Gameplay.Tag;
 
@@ -13,7 +14,7 @@ public class GameplayTagCountContainer
     public Dictionary<GameplayTag, int> ExplicitTagCountMap { get; set; } = new();
     public GameplayTagContainer ExplicitTags { get; set; } = new();
     public OnGameplayEffectTagCountChanged OnAnyTagChangeDelegate { get; set; }
-    public Dictionary<GameplayTag, DelegateInfo> GameplayTagEventMap { get; set; }
+    public Dictionary<GameplayTag, DelegateInfo> GameplayTagEventMap { get; set; } = new();
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -26,7 +27,6 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasAllMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -48,7 +48,6 @@ public class GameplayTagCountContainer
         return allMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasAnyMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -70,7 +69,6 @@ public class GameplayTagCountContainer
         return anyMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void UpdateTagCount(GameplayTagContainer container, int countDelta)
     {
         if (countDelta != 0)
@@ -96,8 +94,13 @@ public class GameplayTagCountContainer
         }
     }
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
+    /// <summary>
+    /// 将某个Tag的堆栈数量加上countDelta（负数就是减去）
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="countDelta"></param>
+    /// <returns></returns>
     public bool UpdateTagCount(GameplayTag tag, int countDelta)
     {
         if (countDelta != 0)
@@ -108,7 +111,6 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool UpdateTagCountDeferredParentRemoval(GameplayTag tag, int countDelta, List<DeferredTagChangeDelegate> tagChangeDelegates)
     {
         if (countDelta != 0)
@@ -119,7 +121,12 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// <summary>
+    /// 将某个Tag的堆栈数量更新未newCount
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="newCount"></param>
+    /// <returns></returns>
     public bool SetTagCount(GameplayTag tag, int newCount)
     {
         var existingCount = 0;
@@ -137,7 +144,6 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetTagCount(GameplayTag tag)
     {
         return ExplicitTagCountMap.GetValueOrDefault(tag, 0);
@@ -199,6 +205,7 @@ public class GameplayTagCountContainer
         
         var tagChangeDelegates = new List<DeferredTagChangeDelegate>();
         var significantChange = gatherTagChangeDelegates(tag, countDelta, tagChangeDelegates);
+        GD.Print($"tagChangeDelegates:{tagChangeDelegates.Count}, significantChange:{significantChange}");
         for (var i = 0; i < tagChangeDelegates.Count; i++)
         {
             var tagChangeDelegate = tagChangeDelegates[i];
@@ -238,14 +245,14 @@ public class GameplayTagCountContainer
             }
         }
 
-        if (ExplicitTagCountMap.TryGetValue(tag, out var count))
+        var existingCount = ExplicitTagCountMap.TryGetValue(tag, out var count)
+            ? Math.Max(count + countDelta, 0)
+            : Math.Max(countDelta, 0);
+        
+        ExplicitTagCountMap[tag] = existingCount;
+        if (existingCount <= 0)
         {
-            count = Math.Max(count + countDelta, 0);
-            ExplicitTagCountMap[tag] = count;
-            if (count <= 0)
-            {
-                ExplicitTags.RemoveTag(tag, deferParentTagsOnRemove);
-            }
+            ExplicitTags.RemoveTag(tag, deferParentTagsOnRemove);
         }
 
         return true;
@@ -265,35 +272,35 @@ public class GameplayTagCountContainer
         for (var i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
         {
             var tagToCheck = tagAndParentsContainer.GameplayTags[i];
-            if (GameplayTagCountMap.TryGetValue(tagToCheck, out var count))
+            var newCount = GameplayTagCountMap.TryGetValue(tag, out var count)
+                ? Math.Max(count + countDelta, 0)
+                : countDelta;
+            
+            var significantChange = count == 0 || newCount == 0;
+            GameplayTagCountMap[tagToCheck] = newCount;
+            createdSignificantChange |= significantChange;
+            if (significantChange)
             {
-                var newCount = Math.Max(count + countDelta, 0);
-                var significantChange = count == 0 || newCount == 0;
-                GameplayTagCountMap[tagToCheck] = newCount;
-                createdSignificantChange |= significantChange;
+                tagChangeDelegates.Add(() =>
+                {
+                    OnAnyTagChangeDelegate?.Invoke(tag, newCount);
+                });
+            }
+
+            if (GameplayTagEventMap.TryGetValue(tagToCheck, out var delegateInfo))
+            {
+                    
+                tagChangeDelegates.Add(() =>
+                {
+                    delegateInfo.OnAnyChange?.Invoke(tag, newCount);
+                });
+                    
                 if (significantChange)
                 {
                     tagChangeDelegates.Add(() =>
                     {
-                        OnAnyTagChangeDelegate?.Invoke(tag, newCount);
+                        delegateInfo.OnNewOrRemove?.Invoke(tag, newCount);
                     });
-                }
-
-                if (GameplayTagEventMap.TryGetValue(tagToCheck, out var delegateInfo))
-                {
-                    
-                    tagChangeDelegates.Add(() =>
-                    {
-                        delegateInfo.OnAnyChange?.Invoke(tag, newCount);
-                    });
-                    
-                    if (significantChange)
-                    {
-                        tagChangeDelegates.Add(() =>
-                        {
-                            delegateInfo.OnNewOrRemove?.Invoke(tag, newCount);
-                        });
-                    }
                 }
             }
         }
