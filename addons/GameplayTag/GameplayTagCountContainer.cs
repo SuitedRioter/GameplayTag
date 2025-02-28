@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 namespace Gameplay.Tag;
 
 
-public class GameplayTagCountContainer
+
+public class GameplayTagCountContainer 
 {
-    
     public Dictionary<GameplayTag, int> GameplayTagCountMap { get; set; } = new();
     public Dictionary<GameplayTag, int> ExplicitTagCountMap { get; set; } = new();
     public GameplayTagContainer ExplicitTags { get; set; } = new();
@@ -26,7 +26,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool HasAllMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -35,7 +35,7 @@ public class GameplayTagCountContainer
         }
 
         var allMatch = true;
-        for (int i = 0; i < tagContainer.GameplayTags.Count; i++)
+        for (var i = 0; i < tagContainer.GameplayTags.Count; i++)
         {
             var tag = tagContainer.GameplayTags[i];
             if (!HasMatchingGameplayTag(tag))
@@ -48,7 +48,7 @@ public class GameplayTagCountContainer
         return allMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool HasAnyMatchingGameplayTags(GameplayTagContainer tagContainer)
     {
         if (tagContainer.IsEmpty())
@@ -57,7 +57,7 @@ public class GameplayTagCountContainer
         }
 
         var anyMatch = false;
-        for (int i = 0; i < tagContainer.GameplayTags.Count; i++)
+        for (var i = 0; i < tagContainer.GameplayTags.Count; i++)
         {
             var tag = tagContainer.GameplayTags[i];
             if (HasMatchingGameplayTag(tag))
@@ -70,14 +70,14 @@ public class GameplayTagCountContainer
         return anyMatch;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public void UpdateTagCount(GameplayTagContainer container, int countDelta)
     {
         if (countDelta != 0)
         {
             var updatedAny = false;
             var tagChangeDelegates = new List<DeferredTagChangeDelegate>();
-            for (int i = 0; i < container.GameplayTags.Count; i++)
+            for (var i = 0; i < container.GameplayTags.Count; i++)
             {
                 var tag = container.GameplayTags[i];
                 updatedAny |= updateTagMapDeferredParentRemovalInternal(tag, countDelta, tagChangeDelegates);
@@ -88,7 +88,7 @@ public class GameplayTagCountContainer
                 ExplicitTags.FillParentTags();
             }
 
-            for (int i = 0; i < tagChangeDelegates.Count; i++)
+            for (var i = 0; i < tagChangeDelegates.Count; i++)
             {
                 var tagChangeDelegate = tagChangeDelegates[i];
                 tagChangeDelegate();
@@ -97,7 +97,7 @@ public class GameplayTagCountContainer
     }
 
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool UpdateTagCount(GameplayTag tag, int countDelta)
     {
         if (countDelta != 0)
@@ -108,7 +108,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool UpdateTagCountDeferredParentRemoval(GameplayTag tag, int countDelta, List<DeferredTagChangeDelegate> tagChangeDelegates)
     {
         if (countDelta != 0)
@@ -119,7 +119,7 @@ public class GameplayTagCountContainer
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
     public bool SetTagCount(GameplayTag tag, int newCount)
     {
         var existingCount = 0;
@@ -146,7 +146,7 @@ public class GameplayTagCountContainer
     public void NotifyStackCountChange(GameplayTag tag)
     {
         var tagAndParentsContainer = GameplayTagsManager.Instance.GetSingleTagContainer(tag);
-        for (int i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
+        for (var i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
         {
             var tagToCheck = tagAndParentsContainer.GameplayTags[i];
             if (GameplayTagEventMap.TryGetValue(tagToCheck, out var delegateInfo))
@@ -199,7 +199,7 @@ public class GameplayTagCountContainer
         
         var tagChangeDelegates = new List<DeferredTagChangeDelegate>();
         var significantChange = gatherTagChangeDelegates(tag, countDelta, tagChangeDelegates);
-        for (int i = 0; i < tagChangeDelegates.Count; i++)
+        for (var i = 0; i < tagChangeDelegates.Count; i++)
         {
             var tagChangeDelegate = tagChangeDelegates[i];
             tagChangeDelegate();
@@ -262,7 +262,7 @@ public class GameplayTagCountContainer
     {
         var tagAndParentsContainer = GameplayTagsManager.Instance.RequestGameplayTagParents(tag);
         var createdSignificantChange = false;
-        for (int i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
+        for (var i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
         {
             var tagToCheck = tagAndParentsContainer.GameplayTags[i];
             if (GameplayTagCountMap.TryGetValue(tagToCheck, out var count))

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace Gameplay.Tag;
@@ -10,10 +11,11 @@ namespace Gameplay.Tag;
 public class GameplayTagsManager
 {
     
-    
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private static readonly Lazy<GameplayTagsManager> _lazyInstance = new(() => new GameplayTagsManager());
 
     // 公共静态属性，用于获取单例实例
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public static GameplayTagsManager Instance => _lazyInstance.Value;
     
     public GameplayTagNode Root { get; set; }
@@ -35,7 +37,7 @@ public class GameplayTagsManager
         var currentNode = Root;
         var parts = tagName.Split(".");
         var fullTagName = "";
-        for (int i = 0; i < parts.Length; i++)
+        for (var i = 0; i < parts.Length; i++)
         {
             var isExplicit = i == parts.Length - 1;
             var shortTagName = parts[i];
@@ -161,7 +163,7 @@ public class GameplayTagNode
     // 查询childTags里面TagName相同的节点索引位置
     public int FindChild(string tagName)
     {
-        for (int i = 0; i < ChildTags.Count; i++)
+        for (var i = 0; i < ChildTags.Count; i++)
         {
             if (string.Equals(ChildTags[i].TagName, tagName, StringComparison.Ordinal))
             {
