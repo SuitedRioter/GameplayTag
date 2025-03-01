@@ -7,6 +7,7 @@ public partial class Test : Node2D
 	public Button AddCount;
 	public Button RemoveCount;
 	public Label InfoDisplay;
+	public Button AddTagEventListen;
 	
 	public GameplayTagCountContainer TagCountContainer;
 	
@@ -16,12 +17,14 @@ public partial class Test : Node2D
 		AddCount = GetNode<Button>("addCount");
 		RemoveCount = GetNode<Button>("removeCount");
 		InfoDisplay = GetNode<Label>("InfoDisplay");
+		AddTagEventListen = GetNode<Button>("addSpecificListen");
 		
 		TagCountContainer = new();
 		TagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
 
 		AddCount.Pressed += addGameplayTagCount;
 		RemoveCount.Pressed += removeGameplayTagCount;
+		AddTagEventListen.Pressed += addTagEventListen;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -93,6 +96,14 @@ public partial class Test : Node2D
 		GameplayTag tagABC = new("A.B.C");
 		var result = TagCountContainer.UpdateTagCount(tagABC, 1);
 		GD.Print($"addGameplayTagCount: {result}");
+		
+		GameplayTag tagAB = new("A.B");
+		GameplayTag tagDCB = new("D.C.B");
+		GameplayTagContainer containerB = new();
+		containerB.AddTag(tagDCB);
+		containerB.AddTag(tagAB);
+		TagCountContainer.UpdateTagCount(containerB, 1);
+		
 	}
 
 	private void removeGameplayTagCount()
@@ -100,11 +111,30 @@ public partial class Test : Node2D
 		GameplayTag tagABC = new("A.B.C");
 		var result = TagCountContainer.UpdateTagCount(tagABC, -1);
 		GD.Print($"removeGameplayTagCount: {result}");
+		
+		GameplayTag tagAB = new("A.B");
+		GameplayTag tagDCB = new("D.C.B");
+		GameplayTagContainer containerB = new();
+		containerB.AddTag(tagDCB);
+		containerB.AddTag(tagAB);
+		TagCountContainer.UpdateTagCount(containerB, -1);
+	}
+
+	private void addTagEventListen()
+	{
+		GameplayTag tagABC = new("A.B.C");
+		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
 	}
 
 	private void onGameplayTagCountChanged(GameplayTag tag, int count)
 	{
 		GD.Print($"onGameplayTagCountChanged: {tag}, {count}");
-		InfoDisplay.Text = $"onGameplayTagCountChanged: {tag}, {count}";
+		InfoDisplay.Text += $"onGameplayTagCountChanged: {tag}, {count}\n";
+	}
+
+	private void onSpecificTagCountChanged(GameplayTag tag, int count)
+	{
+		GD.Print($"onSpecificTagCountChanged: {tag}, {count}");
+		InfoDisplay.Text += $"onSpecificTagCountChanged: {tag}, {count}\n";
 	}
 }

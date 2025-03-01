@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Godot;
 
 namespace Gameplay.Tag;
@@ -97,6 +98,7 @@ public class GameplayTagCountContainer
     
     /// <summary>
     /// 将某个Tag的堆栈数量加上countDelta（负数就是减去）
+    /// 需要注意，还会给父Tag的堆栈数量加上countDelta（负数就是减去）
     /// </summary>
     /// <param name="tag"></param>
     /// <param name="countDelta"></param>
@@ -122,7 +124,8 @@ public class GameplayTagCountContainer
     }
 
     /// <summary>
-    /// 将某个Tag的堆栈数量更新未newCount
+    /// 将某个Tag的堆栈数量更新为newCount
+    /// 注意Tag的父级也会
     /// </summary>
     /// <param name="tag"></param>
     /// <param name="newCount"></param>
@@ -167,15 +170,21 @@ public class GameplayTagCountContainer
         }
     }
 
-    public OnGameplayEffectTagCountChanged RegisterGameplayTagEvent(GameplayTag tag, EGameplayTagEventType eventType)
+    public void RegisterGameplayTagEvent(GameplayTag tag, EGameplayTagEventType eventType, OnGameplayEffectTagCountChanged callable)
     {
-        var delegateInfo = new DelegateInfo();
-        if (GameplayTagEventMap.TryAdd(tag, delegateInfo))
+        ref var delegateInfo =
+            ref CollectionsMarshal.GetValueRefOrAddDefault(GameplayTagEventMap, tag, out bool exists);
+        if (!exists)
         {
-            delegateInfo = GameplayTagEventMap[tag];
+            delegateInfo = new DelegateInfo();
         }
+        
+        if (eventType == EGameplayTagEventType.NewOrRemove)
+        {
+            delegateInfo.OnNewOrRemove += callable;
+        }
+        delegateInfo.OnAnyChange += callable;
 
-        return eventType == EGameplayTagEventType.NewOrRemove ? delegateInfo.OnNewOrRemove : delegateInfo.OnAnyChange;
         
     }
 
@@ -205,7 +214,7 @@ public class GameplayTagCountContainer
         
         var tagChangeDelegates = new List<DeferredTagChangeDelegate>();
         var significantChange = gatherTagChangeDelegates(tag, countDelta, tagChangeDelegates);
-        GD.Print($"tagChangeDelegates:{tagChangeDelegates.Count}, significantChange:{significantChange}");
+
         for (var i = 0; i < tagChangeDelegates.Count; i++)
         {
             var tagChangeDelegate = tagChangeDelegates[i];
@@ -259,6 +268,7 @@ public class GameplayTagCountContainer
     }
 
     /// <summary>
+    /// 收集tag自己和父级所有标签变化的通知集合
     /// 这里有3个事件通知
     /// 1. 这个container自身有一个事件通知，就是这个这个容器任何变化，都会发送这个事件
     /// 2. 这个容器内，某个标签的2种通知，就是EventType的那两种，在特定时刻去发送。
@@ -272,10 +282,10 @@ public class GameplayTagCountContainer
         for (var i = 0; i < tagAndParentsContainer.GameplayTags.Count; i++)
         {
             var tagToCheck = tagAndParentsContainer.GameplayTags[i];
-            var newCount = GameplayTagCountMap.TryGetValue(tag, out var count)
+            var newCount = GameplayTagCountMap.TryGetValue(tagToCheck, out var count)
                 ? Math.Max(count + countDelta, 0)
                 : countDelta;
-            
+            //是否是重大更新，比如新增或者移除
             var significantChange = count == 0 || newCount == 0;
             GameplayTagCountMap[tagToCheck] = newCount;
             createdSignificantChange |= significantChange;
@@ -283,7 +293,7 @@ public class GameplayTagCountContainer
             {
                 tagChangeDelegates.Add(() =>
                 {
-                    OnAnyTagChangeDelegate?.Invoke(tag, newCount);
+                    OnAnyTagChangeDelegate?.Invoke(tagToCheck, newCount);
                 });
             }
 
@@ -292,14 +302,14 @@ public class GameplayTagCountContainer
                     
                 tagChangeDelegates.Add(() =>
                 {
-                    delegateInfo.OnAnyChange?.Invoke(tag, newCount);
+                    delegateInfo.OnAnyChange?.Invoke(tagToCheck, newCount);
                 });
                     
                 if (significantChange)
                 {
                     tagChangeDelegates.Add(() =>
                     {
-                        delegateInfo.OnNewOrRemove?.Invoke(tag, newCount);
+                        delegateInfo.OnNewOrRemove?.Invoke(tagToCheck, newCount);
                     });
                 }
             }
@@ -317,8 +327,8 @@ public enum EGameplayTagEventType
 
 public struct DelegateInfo
 {
-    public OnGameplayEffectTagCountChanged OnNewOrRemove { get;set; }
-    public OnGameplayEffectTagCountChanged OnAnyChange { get; set; }
+    public OnGameplayEffectTagCountChanged OnNewOrRemove { get; set; } 
+    public OnGameplayEffectTagCountChanged OnAnyChange { get; set; } 
 };
 
 public delegate void DeferredTagChangeDelegate();

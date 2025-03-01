@@ -24,7 +24,7 @@ public class GameplayTagsManager
     // 私有构造函数，防止外部实例化
     private GameplayTagsManager()
     {
-        Root = new GameplayTagNode("root", "root", null, false);
+        Root = new GameplayTagNode();
         TagMap = new Dictionary<GameplayTag, GameplayTagNode>();
     }
 
@@ -135,10 +135,15 @@ public struct GameplayTagTableRow
 public class GameplayTagNode
 {
     public string TagName { get; set; }
-    public GameplayTagContainer CompleteTagWithParents { get; set; }
+    public GameplayTagContainer CompleteTagWithParents { get; set; } = new();
     public bool IsExplicitTag;
-    public List<GameplayTagNode> ChildTags { get; set; }
+    public List<GameplayTagNode> ChildTags { get; set; } = new();
     public GameplayTagNode ParentTag { get; set; }
+    
+    public GameplayTagNode()
+    {
+        
+    }
     
     public GameplayTagNode(string tagName, string fullName, GameplayTagNode parentTag, bool isExplicitTag)
     {

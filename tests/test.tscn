@@ -20,8 +20,15 @@ offset_bottom = 138.0
 text = "TagCount-1"
 
 [node name="InfoDisplay" type="Label" parent="."]
-offset_left = 215.0
+offset_left = 355.0
 offset_top = 74.0
-offset_right = 515.0
+offset_right = 655.0
 offset_bottom = 124.0
 horizontal_alignment = 1
+
+[node name="addSpecificListen" type="Button" parent="."]
+offset_left = 71.0
+offset_top = 155.0
+offset_right = 172.0
+offset_bottom = 186.0
+text = "添加A.B.C标签的变化监听"
