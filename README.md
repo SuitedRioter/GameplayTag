@@ -17,6 +17,8 @@ Therefore, anyone interested can refer to the project code and the Godot plugin 
 
 所以有兴趣的人，可以参考项目代码和Godot插件编写指南，自行弄一个Godot插件，添加配置和维护标签配置定义
 
+本分支的代码将会与Godot高度集成，比如改写某些类为集成Godot的Resource等，使用Godot的信号而不是CSharp的原生委托等，方便集成到Godot编辑器上。
+
 ### 使用上，了解下面三个类的使用方式和概念即可。
 1. GameplayTagContainer
 * GameplayTagContainer is a tag container used for storing and manipulating GameplayTags.
