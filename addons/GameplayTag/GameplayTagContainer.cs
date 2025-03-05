@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 
 
 namespace Gameplay.Tag;
@@ -360,8 +359,8 @@ public enum GameplayTagQueryExprType
 }
 
 
-[GlobalClass]
-public partial class GameplayTagQueryExpression : Resource
+
+public class GameplayTagQueryExpression
 {
     public GameplayTagQueryExprType ExprType { get; set; } = GameplayTagQueryExprType.Undefined;
     public List<GameplayTagQueryExpression> ExprSet { get; set; } = new();
