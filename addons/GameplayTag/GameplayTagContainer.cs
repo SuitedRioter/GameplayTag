@@ -73,7 +73,7 @@ public class GameplayTagContainer
         var singleContainer = GameplayTagsManager.Instance.GetSingleTagContainer(tag);
         if (singleContainer != null)
         {
-            for (int i = 0; i < singleContainer.ParentTags.Count; i++)
+            for (var i = 0; i < singleContainer.ParentTags.Count; i++)
             {
                 var parentTag = singleContainer.ParentTags[i];
                 var index = ParentTags.BinarySearch(parentTag);
@@ -93,7 +93,7 @@ public class GameplayTagContainer
     public void FillParentTags()
     {
         ParentTags.Clear();
-        for (int i = 0; i < GameplayTags.Count; i++)
+        for (var i = 0; i < GameplayTags.Count; i++)
         {
             var tag = GameplayTags[i];
             AddParentTag(tag);
@@ -102,21 +102,24 @@ public class GameplayTagContainer
 
     public bool RemoveTag(GameplayTag tag, bool deferParentTags)
     {
-        int index = FindTagIndex(tag);
-        if (index >= 0)
+        var index = findTagIndex(tag);
+        if (index < 0)
         {
-            GameplayTags.RemoveAt(index);
-            if (!deferParentTags)
-            {
-                FillParentTags();
-            }
+            return false;
         }
-        return false;
+        
+        GameplayTags.RemoveAt(index);
+        if (!deferParentTags)
+        {
+            FillParentTags();
+        }
+        
+        return true;
     }
 
     public void AppendTags(GameplayTagContainer other)
     {
-        for (int i = 0; i < other.GameplayTags.Count; i++)
+        for (var i = 0; i < other.GameplayTags.Count; i++)
         {
             var tag = other.GameplayTags[i];
             AddTag(tag);
@@ -131,7 +134,7 @@ public class GameplayTagContainer
     public GameplayTagContainer Filter(GameplayTagContainer other)
     {
         var result = new GameplayTagContainer();
-        for (int i = 0; i < GameplayTags.Count; i++)
+        for (var i = 0; i < GameplayTags.Count; i++)
         {
             var tag = GameplayTags[i];
             if (tag.MatchesAny(other))
@@ -145,7 +148,7 @@ public class GameplayTagContainer
     public GameplayTagContainer FilterExact(GameplayTagContainer other)
     {
         var result = new GameplayTagContainer();
-        for (int i = 0; i < GameplayTags.Count; i++)
+        for (var i = 0; i < GameplayTags.Count; i++)
         {
             var tag = GameplayTags[i];
             if (tag.MatchesAnyExact(other))
@@ -171,7 +174,7 @@ public class GameplayTagContainer
     {
         if (!containerToCheck.IsEmpty())
         {
-            for (int i = 0; i < containerToCheck.GameplayTags.Count; i++)
+            for (var i = 0; i < containerToCheck.GameplayTags.Count; i++)
             {
                 var otherTag = containerToCheck.GameplayTags[i];
                 if (HasTag(otherTag))
@@ -187,7 +190,7 @@ public class GameplayTagContainer
     {
         if (!containerToCheck.IsEmpty())
         {
-            for (int i = 0; i < containerToCheck.GameplayTags.Count; i++)
+            for (var i = 0; i < containerToCheck.GameplayTags.Count; i++)
             {
                 var otherTag = containerToCheck.GameplayTags[i];
                 if (HasTagExact(otherTag))
@@ -203,7 +206,7 @@ public class GameplayTagContainer
     {
         if (!containerToCheck.IsEmpty())
         {
-            for (int i = 0; i < containerToCheck.GameplayTags.Count; i++)
+            for (var i = 0; i < containerToCheck.GameplayTags.Count; i++)
             {
                 var otherTag = containerToCheck.GameplayTags[i];
                 if (!HasTag(otherTag))
@@ -220,7 +223,7 @@ public class GameplayTagContainer
     {
         if (!containerToCheck.IsEmpty())
         {
-            for (int i = 0; i < containerToCheck.GameplayTags.Count; i++)
+            for (var i = 0; i < containerToCheck.GameplayTags.Count; i++)
             {
                 var otherTag = containerToCheck.GameplayTags[i];
                 if (!HasTagExact(otherTag))
@@ -240,7 +243,7 @@ public class GameplayTagContainer
         ParentTags.Clear();
     }
 
-    private int FindTagIndex(GameplayTag tag)
+    private int findTagIndex(GameplayTag tag)
     {
         return GameplayTags.BinarySearch(tag);
     }
@@ -356,6 +359,7 @@ public enum GameplayTagQueryExprType
 }
 
 
+
 public class GameplayTagQueryExpression
 {
     public GameplayTagQueryExprType ExprType { get; set; } = GameplayTagQueryExprType.Undefined;
@@ -431,7 +435,7 @@ public class GameplayTagQueryExpression
 
     public GameplayTagQueryExpression AddTags(GameplayTagContainer tags)
     {
-        for (int i = 0; i < tags.GameplayTags.Count; i++)
+        for (var i = 0; i < tags.GameplayTags.Count; i++)
         {
             TagSet.Add(tags.GameplayTags[i]);
         }
@@ -457,7 +461,7 @@ public class GameplayTagQueryExpression
         switch (ExprType)
         {
             case GameplayTagQueryExprType.AnyTagsMatch:
-                for (int i = 0; i < TagSet.Count; i++)
+                for (var i = 0; i < TagSet.Count; i++)
                 {
                     var tag = TagSet[i];
                     if (container.HasTag(tag))
@@ -467,7 +471,7 @@ public class GameplayTagQueryExpression
                 }
                 return false;
             case GameplayTagQueryExprType.AllTagsMatch:
-                for (int i = 0; i < TagSet.Count; i++)
+                for (var i = 0; i < TagSet.Count; i++)
                 {
                     var tag = TagSet[i];
                     if (!container.HasTag(tag))
@@ -477,7 +481,7 @@ public class GameplayTagQueryExpression
                 }
                 return true;
             case GameplayTagQueryExprType.NoTagsMatch:
-                for (int i = 0; i < TagSet.Count; i++)
+                for (var i = 0; i < TagSet.Count; i++)
                 {
                     var tag = TagSet[i];
                     if (container.HasTag(tag))
@@ -487,7 +491,7 @@ public class GameplayTagQueryExpression
                 }
                 return true;
             case GameplayTagQueryExprType.AnyExprMatch:
-                for (int i = 0; i < ExprSet.Count; i++)
+                for (var i = 0; i < ExprSet.Count; i++)
                 {
                     var expr = ExprSet[i];
                     if (expr.Matches(container))
@@ -497,7 +501,7 @@ public class GameplayTagQueryExpression
                 }
                 return false;
             case GameplayTagQueryExprType.AllExprMatch:
-                for (int i = 0; i < ExprSet.Count; i++)
+                for (var i = 0; i < ExprSet.Count; i++)
                 {
                     var expr = ExprSet[i];
                     if (!expr.Matches(container))
@@ -507,7 +511,7 @@ public class GameplayTagQueryExpression
                 }
                 return true;
             case GameplayTagQueryExprType.NoExprMatch:
-                for (int i = 0; i < ExprSet.Count; i++)
+                for (var i = 0; i < ExprSet.Count; i++)
                 {
                     var expr = ExprSet[i];
                     if (expr.Matches(container))
@@ -531,7 +535,7 @@ public class GameplayTagQuery
 
     public bool IsEmpty()
     {
-        return Expr.IsValid();
+        return !Expr.IsValid();
     }
 
     public static GameplayTagQuery Build(GameplayTagQueryExpression expression)

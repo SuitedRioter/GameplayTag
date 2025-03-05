@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace Gameplay.Tag;
@@ -10,10 +11,11 @@ namespace Gameplay.Tag;
 public class GameplayTagsManager
 {
     
-    
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private static readonly Lazy<GameplayTagsManager> _lazyInstance = new(() => new GameplayTagsManager());
 
     // 公共静态属性，用于获取单例实例
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public static GameplayTagsManager Instance => _lazyInstance.Value;
     
     public GameplayTagNode Root { get; set; }
@@ -22,7 +24,7 @@ public class GameplayTagsManager
     // 私有构造函数，防止外部实例化
     private GameplayTagsManager()
     {
-        Root = new GameplayTagNode("root", "root", null, false);
+        Root = new GameplayTagNode();
         TagMap = new Dictionary<GameplayTag, GameplayTagNode>();
     }
 
@@ -35,7 +37,7 @@ public class GameplayTagsManager
         var currentNode = Root;
         var parts = tagName.Split(".");
         var fullTagName = "";
-        for (int i = 0; i < parts.Length; i++)
+        for (var i = 0; i < parts.Length; i++)
         {
             var isExplicit = i == parts.Length - 1;
             var shortTagName = parts[i];
@@ -133,10 +135,15 @@ public struct GameplayTagTableRow
 public class GameplayTagNode
 {
     public string TagName { get; set; }
-    public GameplayTagContainer CompleteTagWithParents { get; set; }
+    public GameplayTagContainer CompleteTagWithParents { get; set; } = new();
     public bool IsExplicitTag;
-    public List<GameplayTagNode> ChildTags { get; set; }
+    public List<GameplayTagNode> ChildTags { get; set; } = new();
     public GameplayTagNode ParentTag { get; set; }
+    
+    public GameplayTagNode()
+    {
+        
+    }
     
     public GameplayTagNode(string tagName, string fullName, GameplayTagNode parentTag, bool isExplicitTag)
     {
@@ -161,7 +168,7 @@ public class GameplayTagNode
     // 查询childTags里面TagName相同的节点索引位置
     public int FindChild(string tagName)
     {
-        for (int i = 0; i < ChildTags.Count; i++)
+        for (var i = 0; i < ChildTags.Count; i++)
         {
             if (string.Equals(ChildTags[i].TagName, tagName, StringComparison.Ordinal))
             {
