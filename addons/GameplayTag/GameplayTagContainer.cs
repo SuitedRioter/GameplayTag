@@ -117,6 +117,26 @@ public class GameplayTagContainer
         return true;
     }
 
+    public void RemoveTags(GameplayTagContainer tagsToRemove)
+    {
+        int numChanged = 0;
+        foreach (var tag in tagsToRemove.GameplayTags)
+        {
+            var index = findTagIndex(tag);
+            if (index < 0)
+            {
+                continue;
+            }
+            numChanged += 1;
+            GameplayTags.RemoveAt(index);
+        }
+
+        if (numChanged > 0)
+        {
+            FillParentTags();
+        }
+    }
+
     public void AppendTags(GameplayTagContainer other)
     {
         for (var i = 0; i < other.GameplayTags.Count; i++)
@@ -125,6 +145,19 @@ public class GameplayTagContainer
             AddTag(tag);
         }
     }
+
+    public void AppendMatchingTags(GameplayTagContainer otherA, GameplayTagContainer otherB)
+    {
+        for (int i = 0; i < otherA.GameplayTags.Count; i++)
+        {
+            var tag = otherA.GameplayTags[i];
+            if (tag.MatchesAny(otherB))
+            {
+                AddTag(tag);
+            }
+        }
+    }
+    
 
     /// <summary>
     /// 返回自身GameplayTags（显式标签）和other GameplayTags（显式标签）的交集
@@ -255,6 +288,11 @@ public class GameplayTagContainer
 public struct GameplayTag : IEquatable<GameplayTag>, IComparable<GameplayTag>
 {
     public string TagName { get; private set; }
+
+    public static GameplayTag RequestGameplayTag(string tagName, bool errorIfNotFound=true)
+    {
+        return GameplayTagsManager.Instance.RequestGameplayTag(tagName, errorIfNotFound);
+    }
 
     public GameplayTag(string tagName)
     {

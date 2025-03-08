@@ -20,12 +20,33 @@ public class GameplayTagsManager
     
     public GameplayTagNode Root { get; set; }
     public Dictionary<GameplayTag, GameplayTagNode> TagMap { get; set; }
-    
+
+    public static HashSet<string> MissingTagName { get; set; } = new();
+
     // 私有构造函数，防止外部实例化
     private GameplayTagsManager()
     {
         Root = new GameplayTagNode();
         TagMap = new Dictionary<GameplayTag, GameplayTagNode>();
+    }
+
+    public GameplayTag RequestGameplayTag(string tagName, bool errorIfNotFound)
+    {
+        var possibleTag = new GameplayTag(tagName);
+        if (TagMap.ContainsKey(possibleTag))
+        {
+            return possibleTag;
+        } 
+        
+        if (errorIfNotFound)
+        {
+            if (MissingTagName.Add(tagName))
+            {
+                //此处可以打个日志
+            }
+        }
+
+        return new GameplayTag();
     }
 
     /// <summary>
