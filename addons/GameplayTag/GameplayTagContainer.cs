@@ -289,6 +289,11 @@ public struct GameplayTag : IEquatable<GameplayTag>, IComparable<GameplayTag>
 {
     public string TagName { get; private set; }
 
+    public static GameplayTag RequestGameplayTag(string tagName, bool errorIfNotFound=true)
+    {
+        return GameplayTagsManager.Instance.RequestGameplayTag(tagName, errorIfNotFound);
+    }
+
     public GameplayTag(string tagName)
     {
         TagName = string.Intern(tagName);
