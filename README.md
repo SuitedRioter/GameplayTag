@@ -53,20 +53,20 @@ GameplayTagsManager.Instance.ConstructGameplayTagTree(new GameplayTagsSettings()
 
 2. GameplayTagContainer使用方式
 ```CSharp
-GameplayTag tagABC = new("A.B.C");
+GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 GameplayTagContainer containerA = new();
 containerA.AddTag(tagABC);
 
 
-GameplayTag tagAB = new("A.B");
-GameplayTag tagDCB = new("D.C.B");
-GameplayTagContainer containerB = new();
+GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
+GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
+GameplayTagContainer containerB = GameplayTag.RequestGameplayTag();
 containerB.AddTag(tagDCB);
 containerB.AddTag(tagAB);
 
 
 GameplayTagContainer containerC = new();
-GameplayTag tagDCB2 = new("D.C.B");
+GameplayTag tagDCB2 = GameplayTag.RequestGameplayTag("D.C.B");
 containerC.AddTag(tagDCB2);
 
 var hasTag = containerA.HasTag(tagABC);  //true
@@ -83,18 +83,18 @@ var hasAllExact = containerB.HasAllExact(containerC);  //true
 ```CSharp
 var require = new GameplayTagRequirement();
 // 1. 自己或者父级需要有A.B.C
-GameplayTag tagABC = new("A.B.C");
+GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 require.RequireTags.AddTag(tagABC);
 // 2. 自己或者父级不能有D.C.B
-GameplayTag tagDCB = new("D.C.B");
+GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 require.IgnoreTags.AddTag(tagDCB);
 // 3. 自己或者父级有A.C
-GameplayTag tagAC = new("A.C");
+GameplayTag tagAC = GameplayTag.RequestGameplayTag("A.C");
 require.TagQuery.Expr.AnyTagsMatch().AddTag(tagAC);
 
 
-GameplayTag tagABC2 = new("A.B.C");
-GameplayTag tagAC2 = new("A.C");
+GameplayTag tagABC2 = GameplayTag.RequestGameplayTag("A.B.C");
+GameplayTag tagAC2 = GameplayTag.RequestGameplayTag("A.C");
 GameplayTagContainer containerA = new();
 containerA.AddTag(tagABC2);
 containerA.AddTag(tagAC2);
@@ -115,14 +115,14 @@ GameplayTagCountContainer TagCountContainer = new();
 TagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
 
 //添加标签堆栈数，
-GameplayTag tagABC = new("A.B.C");
+GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 var result = TagCountContainer.UpdateTagCount(tagABC, 1);
 //负数就是减去
 //var result = TagCountContainer.UpdateTagCount(tagABC, -1);
 
 
-GameplayTag tagAB = new("A.B");
-GameplayTag tagDCB = new("D.C.B");
+GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
+GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 GameplayTagContainer containerB = new();
 containerB.AddTag(tagDCB);
 containerB.AddTag(tagAB);
@@ -132,7 +132,7 @@ TagCountContainer.UpdateTagCount(containerB, 1);
 //绑定监听某个容器里，特定标签的变化。两种变化：
 // 1. 任何标签堆叠数量变化 AnyCountChange
 // 2. 新增或删除某个标签的变化 NewOrRemove
-GameplayTag tagABC = new("A.B.C");
+GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
 
 private void onSpecificTagCountChanged(GameplayTag tag, int count)

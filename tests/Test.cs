@@ -38,18 +38,18 @@ public partial class Test : Node2D
 	{
 		var require = new GameplayTagRequirement();
 		// 1. 自己或者父级需要有A.B.C
-		GameplayTag tagABC = new("A.B.C");
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 		require.RequireTags.AddTag(tagABC);
 		// 2. 自己或者父级不能有D.C.B
-		GameplayTag tagDCB = new("D.C.B");
+		GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 		require.IgnoreTags.AddTag(tagDCB);
 		// 3. 自己或者父级有A.C
-		GameplayTag tagAC = new("A.C");
+		GameplayTag tagAC = GameplayTag.RequestGameplayTag("A.C");
 		require.TagQuery.Expr.AnyTagsMatch().AddTag(tagAC);
 		
 		
-		GameplayTag tagABC2 = new("A.B.C");
-		GameplayTag tagAC2 = new("A.C");
+		GameplayTag tagABC2 = GameplayTag.RequestGameplayTag("A.B.C");
+		GameplayTag tagAC2 = GameplayTag.RequestGameplayTag("A.C");
 		GameplayTagContainer containerA = new();
 		containerA.AddTag(tagABC2);
 		containerA.AddTag(tagAC2);
@@ -61,20 +61,20 @@ public partial class Test : Node2D
 	public void GameplayTagContainerTest()
 	{
         
-		GameplayTag tagABC = new("A.B.C");
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 		GameplayTagContainer containerA = new();
 		containerA.AddTag(tagABC);
         
         
-		GameplayTag tagAB = new("A.B");
-		GameplayTag tagDCB = new("D.C.B");
+		GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
+		GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 		GameplayTagContainer containerB = new();
 		containerB.AddTag(tagDCB);
 		containerB.AddTag(tagAB);
         
         
 		GameplayTagContainer containerC = new();
-		GameplayTag tagDCB2 = new("D.C.B");
+		GameplayTag tagDCB2 = GameplayTag.RequestGameplayTag("D.C.B");
 		containerC.AddTag(tagDCB2);
 
 		var hasTag = containerA.HasTag(tagABC);  //true
@@ -93,12 +93,12 @@ public partial class Test : Node2D
 
 	private void addGameplayTagCount()
 	{
-		GameplayTag tagABC = new("A.B.C");
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 		var result = TagCountContainer.UpdateTagCount(tagABC, 1);
 		GD.Print($"addGameplayTagCount: {result}");
 		
-		GameplayTag tagAB = new("A.B");
-		GameplayTag tagDCB = new("D.C.B");
+		GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
+		GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 		GameplayTagContainer containerB = new();
 		containerB.AddTag(tagDCB);
 		containerB.AddTag(tagAB);
@@ -108,12 +108,12 @@ public partial class Test : Node2D
 
 	private void removeGameplayTagCount()
 	{
-		GameplayTag tagABC = new("A.B.C");
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 		var result = TagCountContainer.UpdateTagCount(tagABC, -1);
 		GD.Print($"removeGameplayTagCount: {result}");
 		
-		GameplayTag tagAB = new("A.B");
-		GameplayTag tagDCB = new("D.C.B");
+		GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
+		GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 		GameplayTagContainer containerB = new();
 		containerB.AddTag(tagDCB);
 		containerB.AddTag(tagAB);
@@ -122,7 +122,7 @@ public partial class Test : Node2D
 
 	private void addTagEventListen()
 	{
-		GameplayTag tagABC = new("A.B.C");
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
 	}
 
