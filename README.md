@@ -1,97 +1,112 @@
-## What is GameplayTag?
+# GameplayTag 项目介绍
 
-GameplayTag is a C# implementation that mimics the GameplayTag plugin from Unreal Engine. Its functionality is nearly identical to that of Unreal Engine's GameplayTag system. Currently, it is designed to be used with Godot. However, if you wish to migrate it to Unity, the process should be relatively straightforward. You would mainly need to adapt the classes exposed to Godot to use Unity's API instead. Since I am not very familiar with Unity, there is no specific migration guide provided here for that engine. It is free and open-source forever!
+## 项目概述
 
-GameplayTag是一个模仿虚幻引擎里面GameplayTag插件的C#版本。功能几乎与虚幻引擎里面的一致。目前是与Godot绑定使用，但如果你想迁移到Unity，改动也是很方便的，应该只需要把几个暴漏给Godot的类迁移使用Unity的API暴漏给Unity引擎使用，不过由于我对Unity不熟，所以这里没有相关的迁移指南。
+`GameplayTag` 是一个模仿虚幻引擎中 `GameplayTag` 插件的 C# 实现，功能几乎与虚幻引擎中的一致。该项目目前与 Godot 引擎绑定使用，但也可以轻松迁移到 Unity 等其他引擎。通过该库，开发者可以灵活地管理和查询游戏中的标签，适用于游戏对象、技能、状态等的精细控制。
 
-## Concept Introduction
-Currently, the project still lacks integration with the Godot editor, such as:
+### 主要功能
+1. **标签管理**：支持创建、添加、删除和查询标签。
+2. **标签容器**：提供 `GameplayTagContainer` 类，用于存储和操作一组标签。
+3. **标签计数**：`GameplayTagCountContainer` 类用于管理标签的计数和事件通知。
+4. **标签需求规则**：`GameplayTagRequirements` 类用于描述复杂的标签需求规则。
+5. **标签树结构**：通过 `GameplayTagsManager` 和 `GameplayTagNode` 类，支持标签的树形结构管理。
 
-Maintaining the configuration definitions of tags through the Godot editor.
-Directly configuring and maintaining GameplayTagContainer, GameplayTagCountContainer, GameplayTagRequirements, etc. on the Godot editor.
-Therefore, anyone interested can refer to the project code and the Godot plugin writing guide to create a Godot plugin that adds and maintains tag configuration definitions.
+## 使用指南
 
-目前该项目还缺少和Godot编辑器的集成，比如：
-1. 通过Godot编辑器维护标签的配置定义
-2. Godot编辑器上直接配置维护GameplayTagContainer，GameplayTagCountContainer，GameplayTagRequirements等
+### 1. 初始化标签管理器
+首先，需要初始化 `GameplayTagsManager`，并加载标签数据。
 
-所以有兴趣的人，可以参考项目代码和Godot插件编写指南，自行弄一个Godot插件，添加配置和维护标签配置定义
-
-### 使用上，了解下面三个类的使用方式和概念即可。
-1. GameplayTagContainer
-* GameplayTagContainer is a tag container used for storing and manipulating GameplayTags.
-* GameplayTagContainer是一个标签容器，用于存储和操作GameplayTag。
-2. GameplayTagCountContainer
-* GameplayTagCountContainer is a tag stack count container used for storing and manipulating the stack counts of GameplayTags. It is utilized for managing game tags with event callbacks for tag count changes.
-* GameplayTagCountContainer是一个标签堆叠数容器，用于存储和操作GameplayTag的堆叠数。用于管理带有标签计数更改的事件回调的游戏标签。
-* One usage scenario: Managing the layer count of skill buffs. For example, A.B.C represents a poison DeBuff. The number of this tag indicates the number of DeBuff layers. Listening for corresponding count change events allows for handling the respective DeBuff logic.
-* 使用场景之一：管理技能buff的层级次数，比如：A.B.C代表毒性DeBuff，那么这个标签有几个，就有几层Debuff，监听对应数量变化事件处理对应的Debuff逻辑，
-3. GameplayTagRequirements
-* GameplayTagRequirements is a tag requirement specifier used to describe a set of tag requirements. Its usage is illustrated in the advanced example below.
-* GameplayTagRequirements是一个标签需求规则器，用于描述一个标签需求，使用方法如下面的高阶用法例子所示：
-4. GameplayTagManager
-* The tag manager is responsible for managing the loading and querying of tags. It's important to note that the tag configuration (such as the JSON configuration in the example) needs to be predefined. Currently, dynamically adding tags that do not exist in the configuration is not supported. (If I recall correctly, Unreal Engine also does not support this, as it can have an impact on performance.)
-* 标签管理器，用于管理标签的加载和查询。需要注意，标签配置（例子里面的json配置），需要提前定义好，目前不支持动态添加配置中不存在的标签。（如果我没记错的话，虚幻引擎应该也不支持，因为这个对性能有一定影响。）
-
-## Getting Started
-
-1. 需要在启动时从配置文件中加载所有的标签，例如如下配置文件：
-```json
-[
-    { "tag_name": "A.B.C", "description": "Description of A.B.C" },
-    { "tag_name": "A.B.D", "description": "Description of A.B.D" },
-    { "tag_name": "A.C", "description": "Description of A.C" },
-    { "tag_name": "D", "description": "Description of D" },
-    { "tag_name": "D.C", "description": "Description of D" },
-    { "tag_name": "D.C.B", "description": "Description of D" },
-    { "tag_name": "A.C.B", "description": "Description of D" }
-]
-```
-```CSharp
-GameplayTagsManager.Instance.ConstructGameplayTagTree(new GameplayTagsSettings());
+```csharp
+var settings = new GameplayTagsSettings();
+GameplayTagsManager.Instance.ConstructGameplayTagTree(settings);
 ```
 
-2. GameplayTagContainer使用方式
-```CSharp
-GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
-GameplayTagContainer containerA = new();
-containerA.AddTag(tagABC);
 
+### 2. 创建和请求标签
+使用 `GameplayTag` 结构体创建或请求标签。
 
-GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
-GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
-GameplayTagContainer containerB = GameplayTag.RequestGameplayTag();
-containerB.AddTag(tagDCB);
-containerB.AddTag(tagAB);
-
-
-GameplayTagContainer containerC = new();
-GameplayTag tagDCB2 = GameplayTag.RequestGameplayTag("D.C.B");
-containerC.AddTag(tagDCB2);
-
-var hasTag = containerA.HasTag(tagABC);  //true
-var hasTagExact = containerA.HasTagExact(tagABC);  //true
-var hasAny = containerA.HasAny(containerB);  //true
-var hasAny2 = containerB.HasAnyExact(containerC); //true
-var hasAll = containerC.HasAll(containerB); //false
-containerB.RemoveTag(tagAB, false);
-var hasAll2 = containerC.HasAll(containerB);  //true
-var hasAllExact = containerB.HasAllExact(containerC);  //true
+```csharp
+var tag = GameplayTag.RequestGameplayTag("A.B.C");
 ```
 
-3. 高阶用法(GameplayTagRequirement与GameplayTagQuery的用法)
-```CSharp
+
+### 3. 使用标签容器
+`GameplayTagContainer` 用于存储和操作一组标签。
+
+```csharp
+var container = new GameplayTagContainer();
+container.AddTag(tag);
+```
+
+
+### 4. 标签查询
+通过 `GameplayTagQuery` 进行复杂的标签查询。
+
+```csharp
+var query = new GameplayTagQuery();
+query.Expr.AllTagsMatch().AddTag(tag);
+bool result = query.Matches(container);
+```
+
+
+### 5. 标签计数
+`GameplayTagCountContainer` 用于管理标签的计数和事件通知。
+
+```csharp
+var countContainer = new GameplayTagCountContainer();
+countContainer.UpdateTagCount(tag, 1);
+```
+
+
+### 6. 标签树结构
+`GameplayTagsManager` 和 `GameplayTagNode` 类支持标签的树形结构管理。
+
+```csharp
+var node = GameplayTagsManager.Instance.GetSingleTagContainer(tag);
+```
+
+
+## 示例代码
+
+以下是一个简单的示例，展示如何使用 `GameplayTag` 库：
+
+```csharp
+// 初始化标签管理器
+var settings = new GameplayTagsSettings();
+GameplayTagsManager.Instance.ConstructGameplayTagTree(settings);
+
+// 创建标签
+var tag = GameplayTag.RequestGameplayTag("A.B.C");
+
+// 使用标签容器
+var container = new GameplayTagContainer();
+container.AddTag(tag);
+
+// 标签查询
+var query = new GameplayTagQuery();
+query.Expr.AllTagsMatch().AddTag(tag);
+bool result = query.Matches(container);
+
+// 标签计数
+var countContainer = new GameplayTagCountContainer();
+countContainer.UpdateTagCount(tag, 1);
+```
+
+
+## 高阶用法
+
+### 1. 标签需求规则 (`GameplayTagRequirements`)
+```csharp
 var require = new GameplayTagRequirement();
-// 1. 自己或者父级需要有A.B.C
+// 1. 自己或者父级需要有 A.B.C
 GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
 require.RequireTags.AddTag(tagABC);
-// 2. 自己或者父级不能有D.C.B
+// 2. 自己或者父级不能有 D.C.B
 GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
 require.IgnoreTags.AddTag(tagDCB);
-// 3. 自己或者父级有A.C
+// 3. 自己或者父级有 A.C
 GameplayTag tagAC = GameplayTag.RequestGameplayTag("A.C");
 require.TagQuery.Expr.AnyTagsMatch().AddTag(tagAC);
-
 
 GameplayTag tagABC2 = GameplayTag.RequestGameplayTag("A.B.C");
 GameplayTag tagAC2 = GameplayTag.RequestGameplayTag("A.C");
@@ -101,42 +116,37 @@ containerA.AddTag(tagAC2);
 var result = require.RequirementsMet(containerA);
 ```
 
-4. GameplayTagCountContainer的用法（带事件通知的标签容器）
 
-```CSharp
-//定义委托方法
+### 2. 带事件通知的标签容器 (`GameplayTagCountContainer`)
+```csharp
+// 定义委托方法
 private void onGameplayTagCountChanged(GameplayTag tag, int count)
 {
     GD.Print($"onGameplayTagCountChanged: {tag}, {count}");
     InfoDisplay.Text += $"onGameplayTagCountChanged: {tag}, {count}\n";
 }
-//绑定委托，这个OnAnyTagChangeDelegate委托是当任意Tag新增或者溢出时触发的
-GameplayTagCountContainer TagCountContainer = new();
-TagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
 
-//添加标签堆栈数，
+// 绑定委托，这个 OnAnyTagChangeDelegate 委托是当任意 Tag 新增或者溢出时触发的
+GameplayTagCountContainer tagCountContainer = new();
+tagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
+
+// 添加标签堆栈数
 GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
-var result = TagCountContainer.UpdateTagCount(tagABC, 1);
-//负数就是减去
-//var result = TagCountContainer.UpdateTagCount(tagABC, -1);
+var result = tagCountContainer.UpdateTagCount(tagABC, 1);
 
-
-GameplayTag tagAB = GameplayTag.RequestGameplayTag("A.B");
-GameplayTag tagDCB = GameplayTag.RequestGameplayTag("D.C.B");
-GameplayTagContainer containerB = new();
-containerB.AddTag(tagDCB);
-containerB.AddTag(tagAB);
-TagCountContainer.UpdateTagCount(containerB, 1);
-
-
-//绑定监听某个容器里，特定标签的变化。两种变化：
+// 绑定监听某个容器里，特定标签的变化。两种变化：
 // 1. 任何标签堆叠数量变化 AnyCountChange
 // 2. 新增或删除某个标签的变化 NewOrRemove
 GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
-TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
+tagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
 
 private void onSpecificTagCountChanged(GameplayTag tag, int count)
 {
     GD.Print($"onSpecificTagCountChanged: {tag}, {count}");
 }
 ```
+
+
+## 结论
+
+`GameplayTag` 库为游戏开发提供了一个强大且灵活的标签管理系统，帮助开发者更好地管理和查询游戏中的各种标签。通过该库，开发者可以轻松实现复杂的标签逻辑，提升游戏的可维护性和扩展性。
