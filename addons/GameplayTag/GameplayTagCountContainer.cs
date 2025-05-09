@@ -183,7 +183,27 @@ public class GameplayTagCountContainer
         {
             delegateInfo.OnNewOrRemove += callable;
         }
-        delegateInfo.OnAnyChange += callable;
+        else
+        {
+            delegateInfo.OnAnyChange += callable;
+        }
+        
+    }
+    
+    public OnGameplayEffectTagCountChanged RegisterGameplayTagEvent(GameplayTag tag, EGameplayTagEventType eventType)
+    {
+        ref var delegateInfo =
+            ref CollectionsMarshal.GetValueRefOrAddDefault(GameplayTagEventMap, tag, out bool exists);
+        if (!exists)
+        {
+            delegateInfo = new DelegateInfo();
+        }
+        
+        if (eventType == EGameplayTagEventType.NewOrRemove)
+        {
+            return delegateInfo.OnNewOrRemove ;
+        }
+        return delegateInfo.OnAnyChange ;
     }
     
     public void UnRegisterGameplayTagEvent(GameplayTag tag, EGameplayTagEventType eventType, OnGameplayEffectTagCountChanged callable)
@@ -199,7 +219,11 @@ public class GameplayTagCountContainer
         {
             delegateInfo.OnNewOrRemove -= callable;
         }
-        delegateInfo.OnAnyChange -= callable;
+        else
+        {
+            delegateInfo.OnAnyChange -= callable;
+        }
+        
     }
 
     public void Reset(bool resetEvents)
@@ -313,7 +337,6 @@ public class GameplayTagCountContainer
 
             if (GameplayTagEventMap.TryGetValue(tagToCheck, out var delegateInfo))
             {
-                    
                 tagChangeDelegates.Add(() =>
                 {
                     delegateInfo.OnAnyChange?.Invoke(tagToCheck, newCount);
@@ -339,11 +362,11 @@ public enum EGameplayTagEventType
     AnyCountChange = 1,
 }
 
-public struct DelegateInfo
+public class DelegateInfo
 {
-    public OnGameplayEffectTagCountChanged OnNewOrRemove { get; set; } 
-    public OnGameplayEffectTagCountChanged OnAnyChange { get; set; } 
-};
+    public OnGameplayEffectTagCountChanged OnNewOrRemove;
+    public OnGameplayEffectTagCountChanged OnAnyChange;
+}
 
 public delegate void DeferredTagChangeDelegate();
 

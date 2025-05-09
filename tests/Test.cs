@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Gameplay.Tag;
 
@@ -127,8 +128,15 @@ public partial class Test : Node2D
 	private void addTagEventListen()
 	{
 		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
-		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.NewOrRemove, onSpecificTagCountChanged);
+		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.NewOrRemove,onSpecificTagCountChanged);
+		var onGameplayEffectTagCountChanged = TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.NewOrRemove);
+		//onGameplayEffectTagCountChanged += onSpecificTagCountChanged;
 		tagChangeDelegates[tagABC] = onSpecificTagCountChanged;
+		onGameplayEffectTagCountChanged -= onSpecificTagCountChanged;
+		if (!(onGameplayEffectTagCountChanged?.GetInvocationList().Any(d => d.Target == this) ?? false))
+		{
+			GD.Print("????????");
+		}
 	}
 
 	private void removeTagEventListen()
