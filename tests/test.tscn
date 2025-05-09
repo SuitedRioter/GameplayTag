@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c2vhlvuhbehak"]
 
-[ext_resource type="Script" path="res://tests/Test.cs" id="1_ngjr8"]
+[ext_resource type="Script" uid="uid://bvaapmbl0wldw" path="res://tests/Test.cs" id="1_ngjr8"]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_ngjr8")
@@ -32,3 +32,10 @@ offset_top = 155.0
 offset_right = 172.0
 offset_bottom = 186.0
 text = "添加A.B.C标签的变化监听"
+
+[node name="removeListen" type="Button" parent="."]
+offset_left = 71.0
+offset_top = 206.0
+offset_right = 264.0
+offset_bottom = 238.0
+text = "去掉A.B.C标签的变化监听"

@@ -184,8 +184,22 @@ public class GameplayTagCountContainer
             delegateInfo.OnNewOrRemove += callable;
         }
         delegateInfo.OnAnyChange += callable;
-
+    }
+    
+    public void UnRegisterGameplayTagEvent(GameplayTag tag, EGameplayTagEventType eventType, OnGameplayEffectTagCountChanged callable)
+    {
+        ref var delegateInfo =
+            ref CollectionsMarshal.GetValueRefOrAddDefault(GameplayTagEventMap, tag, out bool exists);
+        if (!exists)
+        {
+            delegateInfo = new DelegateInfo();
+        }
         
+        if (eventType == EGameplayTagEventType.NewOrRemove)
+        {
+            delegateInfo.OnNewOrRemove -= callable;
+        }
+        delegateInfo.OnAnyChange -= callable;
     }
 
     public void Reset(bool resetEvents)

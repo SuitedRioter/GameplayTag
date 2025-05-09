@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Gameplay.Tag;
 
@@ -8,6 +9,7 @@ public partial class Test : Node2D
 	public Button RemoveCount;
 	public Label InfoDisplay;
 	public Button AddTagEventListen;
+	public Button RemoveListen;
 	
 	public GameplayTagCountContainer TagCountContainer;
 	
@@ -18,6 +20,7 @@ public partial class Test : Node2D
 		RemoveCount = GetNode<Button>("removeCount");
 		InfoDisplay = GetNode<Label>("InfoDisplay");
 		AddTagEventListen = GetNode<Button>("addSpecificListen");
+		RemoveListen = GetNode<Button>("removeListen");
 		
 		TagCountContainer = new();
 		TagCountContainer.OnAnyTagChangeDelegate = onGameplayTagCountChanged;
@@ -25,6 +28,7 @@ public partial class Test : Node2D
 		AddCount.Pressed += addGameplayTagCount;
 		RemoveCount.Pressed += removeGameplayTagCount;
 		AddTagEventListen.Pressed += addTagEventListen;
+		RemoveListen.Pressed += removeTagEventListen;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -119,11 +123,21 @@ public partial class Test : Node2D
 		containerB.AddTag(tagAB);
 		TagCountContainer.UpdateTagCount(containerB, -1);
 	}
-
+	private Dictionary<GameplayTag, OnGameplayEffectTagCountChanged> tagChangeDelegates = new();
 	private void addTagEventListen()
 	{
 		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
-		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, onSpecificTagCountChanged);
+		TagCountContainer.RegisterGameplayTagEvent(tagABC, EGameplayTagEventType.NewOrRemove, onSpecificTagCountChanged);
+		tagChangeDelegates[tagABC] = onSpecificTagCountChanged;
+	}
+
+	private void removeTagEventListen()
+	{
+		GameplayTag tagABC = GameplayTag.RequestGameplayTag("A.B.C");
+		if (tagChangeDelegates.TryGetValue(tagABC, out var changed))
+		{
+			TagCountContainer.UnRegisterGameplayTagEvent(tagABC, EGameplayTagEventType.AnyCountChange, changed);
+		}
 	}
 
 	private void onGameplayTagCountChanged(GameplayTag tag, int count)
